@@ -1,25 +1,34 @@
 @extends('layouts.app')
-
 @section('title', 'Login')
 
 @section('content')
 <div class="card narrow">
-    <h1>Login</h1>
-    <p class="muted">Masuk untuk membuat atau memantau laporan.</p>
+    <h2 style="margin-top: 0;">Login</h2>
+    <p style="color: #666; margin-bottom: 20px;">Masuk untuk membuat atau memantau laporan.</p>
 
-    @error('username')
-        <div class="alert alert-danger">{{ $message }}</div>
-    @enderror
+    @if ($errors->any())
+        <div style="background: #f8d7da; color: #721c24; padding: 10px; border-radius: 4px; margin-bottom: 16px;">
+            <ul style="margin: 0; padding-left: 20px;">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
 
     <form method="POST" action="{{ route('login') }}">
         @csrf
-        <label for="username">Username</label>
-        <input id="username" name="username" type="text" value="{{ old('username') }}" autofocus required>
+        <div class="form-group">
+            <label for="username">Username</label>
+            <input type="text" id="username" name="username" class="form-control" value="{{ old('username') }}" required autofocus>
+        </div>
 
-        <label for="password">Password</label>
-        <input id="password" name="password" type="password" required>
+        <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" class="form-control" required>
+        </div>
 
-        <button type="submit" class="btn">Masuk</button>
+        <button type="submit" class="btn btn-block" style="margin-top: 10px;">Masuk</button>
     </form>
 </div>
 @endsection
