@@ -10,9 +10,9 @@ class UserSeeder extends Seeder
 {
     public function run(): void
     {
-        // 1. Akun Koordinator (Ibu Sita)
+        // 1. Akun Koordinator (Ibu Sita) - Nama dirapikan
         User::create([
-            'name' => 'Ibu Sita (Koordinator)',
+            'name' => 'Ibu Sita',
             'username' => 'sita',
             'password' => Hash::make('Mbg#Demo2026'),
             'role' => 'koordinator',
@@ -21,16 +21,16 @@ class UserSeeder extends Seeder
 
         // 2. Akun Pemantau Komunitas (Pak Dedi)
         User::create([
-            'name' => 'Pak Dedi (Pemantau)',
+            'name' => 'Pak Dedi',
             'username' => 'dedi',
             'password' => Hash::make('Mbg#Demo2026'),
             'role' => 'pemantau',
-            'school_id' => 1, // Terikat dengan SMP Harapan
+            'school_id' => 1,
         ]);
 
         // 3. Akun Pelapor (Bu Rina)
         User::create([
-            'name' => 'Bu Rina (Pelapor)',
+            'name' => 'Bu Rina',
             'username' => 'rina',
             'password' => Hash::make('Mbg#Demo2026'),
             'role' => 'pelapor',
@@ -39,7 +39,7 @@ class UserSeeder extends Seeder
 
         // 4. Akun Pelapor 2 (Pak Andi)
         User::create([
-            'name' => 'Pak Andi (Pelapor)',
+            'name' => 'Pak Andi',
             'username' => 'andi',
             'password' => Hash::make('Mbg#Demo2026'),
             'role' => 'pelapor',

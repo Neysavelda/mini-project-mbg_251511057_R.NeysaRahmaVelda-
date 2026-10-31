@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CoordinatorSummaryController;
 use App\Http\Controllers\EvidenceController;
 use App\Http\Controllers\IncidentReportController;
 use App\Http\Controllers\MealDistributionController;
@@ -35,5 +36,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/reviews', [ReportReviewController::class, 'index'])->name('reviews.index');
     Route::get('/reviews/{report}', [ReportReviewController::class, 'show'])->name('reviews.show');
     Route::post('/reviews/{report}/note', [ReportReviewController::class, 'storeNote'])->name('reviews.note');
+
+    // Ringkasan Laporan Koordinator (Fase 7)
     Route::get('/summary', [CoordinatorSummaryController::class, 'index'])->name('coordinator.summary');
 });

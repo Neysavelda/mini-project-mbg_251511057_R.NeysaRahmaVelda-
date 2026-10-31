@@ -2,7 +2,11 @@
 
 namespace App\Providers;
 
+use App\Models\User;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
+use App\Models\IncidentReport;
+use App\Observers\IncidentReportObserver;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -19,6 +23,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        // Gate untuk Koordinator (Access Master Data & Summary)
+        Gate::define('manage-master-data', function (User $user) {
+            return $user->role === 'koordinator';
+            IncidentReport::observe(IncidentReportObserver::class);
+        });
     }
 }

@@ -36,42 +36,51 @@ class IncidentReportController extends Controller
     /**
      * Menyimpan laporan baru ke database
      */
-    public function store(Request $request): RedirectResponse
+    public function store(Request $request)
     {
-        // Validasi input form (AC-04: bukti opsional, max 2MB, format jpg/jpeg/png/pdf)
-        $validated = $request->validate([
-            'school_id' => ['required', 'exists:schools,id'],
-            'meal_distribution_id' => ['required', 'exists:meal_distributions,id'],
-            'incident_at' => ['required', 'date'],
-            'affected_count' => ['required', 'integer', 'min:1'],
-            'description' => ['required', 'string'],
-            'evidence' => ['nullable', 'file', 'mimes:jpg,jpeg,png,pdf', 'max:2048']        ]);
+        $request->validate([
+            'meal_distribution_id' => 'required|exists:meal_distributions,id',
+            'incident_at'          => 'required|date',
+            'affected_count'       => 'required|integer|min:1',
+            'description'          => 'required|string',
+            'evidence'             => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048',
+        ], [
+            'evidence.mimes' => 'Berkas bukti pendukung harus berformat JPG, PNG, atau PDF.',
+            'evidence.max'   => 'Ukuran berkas maksimal adalah 2MB.',
+        ]);
 
-        // Validasi Relasi Server-Side (AC-03): Memastikan distribusi milik sekolah yang dipilih
-        $distribution = MealDistribution::findOrFail($validated['meal_distribution_id']);
-        if ($distribution->school_id != $validated['school_id']) {
-            return back()
-                ->withErrors(['meal_distribution_id' => 'Jadwal distribusi tidak sesuai dengan sekolah yang dipilih.'])
-                ->withInput();
+        // BR-05: Pelapor tidak boleh membuat laporan baru di distribusi yang sama jika laporan sebelumnya belum Selesai
+        $existingReport = IncidentReport::where('user_id', auth()->id())
+            ->where('meal_distribution_id', $request->meal_distribution_id)
+            ->where('status', '!=', IncidentReport::STATUS_RESOLVED)
+            ->exists();
+
+        if ($existingReport) {
+            return back()->withInput()->withErrors([
+                'meal_distribution_id' => 'Anda sudah memiliki laporan aktif untuk jadwal distribusi ini yang sedang diproses.'
+            ]);
         }
 
-        // Penanganan Unggah Bukti ke Private Storage (Fase 5 / AC-05)
+        if ($existingReport) {
+            return back()->withInput()->withErrors([
+                'meal_distribution_id' => 'Anda sudah membuat laporan untuk jadwal distribusi ini yang masih dalam proses.'
+            ]);
+        }
+
         $evidencePath = null;
         if ($request->hasFile('evidence')) {
-            $evidencePath = $request->file('evidence')->store('evidences');
+            $evidencePath = $request->file('evidence')->store('evidences', 'local');
         }
 
-        // Simpan Data Laporan dengan Status Awal "Dikirim"
-        $report = new IncidentReport();
-        $report->user_id = Auth::id();
-        $report->meal_distribution_id = $validated['meal_distribution_id'];
-        $report->incident_at = $validated['incident_at'];
-        $report->affected_count = $validated['affected_count'];
-        $report->description = $validated['description'];
-        $report->evidence_path = $evidencePath;
-        $report->status = IncidentReport::STATUS_SUBMITTED;
-        $report->save();
+        IncidentReport::create([
+            'user_id'              => auth()->id(),
+            'meal_distribution_id' => $request->meal_distribution_id,
+            'incident_at'          => $request->incident_at,
+            'affected_count'       => $request->affected_count,
+            'description'          => $request->description,
+            'evidence_path'        => $evidencePath,
+            'status'               => IncidentReport::STATUS_SUBMITTED,
+        ]);
 
-        return redirect()->route('dashboard')->with('status', 'Laporan keluhan berhasil dikirim!');
+        return redirect()->route('dashboard')->with('success', 'Laporan keluhan berhasil dikirim.');
     }
-}

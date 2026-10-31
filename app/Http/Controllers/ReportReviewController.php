@@ -13,17 +13,36 @@ class ReportReviewController extends Controller
     /**
      * Menampilkan daftar laporan masuk (Pemantau hanya melihat sekolahnya)
      */
-    public function index()
+    public function index(Request $request)
     {
-        $user = Auth::user();
+        $query = IncidentReport::with(['distribution.school', 'reporter']);
 
-        if ($user->role === 'pemantau') {
-            $reports = IncidentReport::whereHas('distribution', function ($query) use ($user) {
-                $query->where('school_id', $user->school_id);
-            })->with(['distribution.school', 'reporter'])->latest()->get();
-        } else {
-            $reports = IncidentReport::with(['distribution.school', 'reporter'])->latest()->get();
+        // Pembatasan sekolah untuk Pemantau (BR-03 / AC-02)
+        if (auth()->user()->role === 'pemantau') {
+            $schoolId = auth()->user()->school_id;
+            $query->whereHas('distribution', function ($q) use ($schoolId) {
+                $q->where('school_id', $schoolId);
+            });
         }
+
+        // AC-10: Filter berdasarkan status
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        // AC-10: Search berdasarkan deskripsi / pelapor
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('description', 'like', "%{$search}%")
+                ->orWhereHas('reporter', function ($qReporter) use ($search) {
+                    $qReporter->where('name', 'like', "%{$search}%");
+                });
+            });
+        }
+
+        // AC-11: Pagination 10 data per halaman
+        $reports = $query->latest()->paginate(10)->withQueryString();
 
         return view('reviews.index', compact('reports'));
     }
