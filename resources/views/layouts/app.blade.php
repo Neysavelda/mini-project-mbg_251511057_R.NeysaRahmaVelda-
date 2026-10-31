@@ -27,6 +27,9 @@
         </div>
         <div>
             @auth
+                @if(auth()->user()->role === 'koordinator')
+                    <a href="{{ route('coordinator.summary') }}" style="margin-right: 16px;">Ringkasan Laporan</a>
+                @endif
                 @if(auth()->user()->role === 'pemantau' || auth()->user()->role === 'koordinator')
                     <a href="{{ route('reviews.index') }}" style="margin-right: 16px;">Daftar Laporan</a>
                 @endif

@@ -5,25 +5,45 @@ namespace Database\Seeders;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
-use App\Models\School;
 
 class UserSeeder extends Seeder
 {
     public function run(): void
     {
-        $password = Hash::make('Mbg#Demo2026');
-        $harapan = School::where('name', 'SMP Harapan')->value('id');
+        // 1. Akun Koordinator (Ibu Sita)
+        User::create([
+            'name' => 'Ibu Sita (Koordinator)',
+            'username' => 'sita',
+            'password' => Hash::make('Mbg#Demo2026'),
+            'role' => 'koordinator',
+            'school_id' => null,
+        ]);
 
-        $accounts = [
-            ['name' => 'Bu Rina',  'username' => 'rina', 'role' => User::ROLE_PELAPOR],
-            ['name' => 'Pak Andi', 'username' => 'andi', 'role' => User::ROLE_PELAPOR],
-            ['name' => 'Pak Dedi', 'username' => 'dedi', 'role' => User::ROLE_PEMANTAU, 'school_id' => $harapan],
-            ['name' => 'Bu Sari',  'username' => 'sari', 'role' => User::ROLE_KOORDINATOR],
-        ];
+        // 2. Akun Pemantau Komunitas (Pak Dedi)
+        User::create([
+            'name' => 'Pak Dedi (Pemantau)',
+            'username' => 'dedi',
+            'password' => Hash::make('Mbg#Demo2026'),
+            'role' => 'pemantau',
+            'school_id' => 1, // Terikat dengan SMP Harapan
+        ]);
 
-        foreach ($accounts as $account) {
-            $user = User::firstOrNew(['username' => $account['username']]);
-            $user->forceFill([...$account, 'password' => $password])->save();
-        }
+        // 3. Akun Pelapor (Bu Rina)
+        User::create([
+            'name' => 'Bu Rina (Pelapor)',
+            'username' => 'rina',
+            'password' => Hash::make('Mbg#Demo2026'),
+            'role' => 'pelapor',
+            'school_id' => null,
+        ]);
+
+        // 4. Akun Pelapor 2 (Pak Andi)
+        User::create([
+            'name' => 'Pak Andi (Pelapor)',
+            'username' => 'andi',
+            'password' => Hash::make('Mbg#Demo2026'),
+            'role' => 'pelapor',
+            'school_id' => null,
+        ]);
     }
 }

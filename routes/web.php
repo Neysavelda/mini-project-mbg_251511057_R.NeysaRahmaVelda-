@@ -35,4 +35,5 @@ Route::middleware('auth')->group(function () {
     Route::get('/reviews', [ReportReviewController::class, 'index'])->name('reviews.index');
     Route::get('/reviews/{report}', [ReportReviewController::class, 'show'])->name('reviews.show');
     Route::post('/reviews/{report}/note', [ReportReviewController::class, 'storeNote'])->name('reviews.note');
+    Route::get('/summary', [CoordinatorSummaryController::class, 'index'])->name('coordinator.summary');
 });
