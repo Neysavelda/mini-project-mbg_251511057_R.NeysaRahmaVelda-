@@ -5,17 +5,19 @@ namespace Database\Seeders;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
+use App\Models\School;
 
 class UserSeeder extends Seeder
 {
     public function run(): void
     {
         $password = Hash::make('Mbg#Demo2026');
+        $harapan = School::where('name', 'SMP Harapan')->value('id');
 
         $accounts = [
             ['name' => 'Bu Rina',  'username' => 'rina', 'role' => User::ROLE_PELAPOR],
             ['name' => 'Pak Andi', 'username' => 'andi', 'role' => User::ROLE_PELAPOR],
-            ['name' => 'Pak Dedi', 'username' => 'dedi', 'role' => User::ROLE_PEMANTAU],
+            ['name' => 'Pak Dedi', 'username' => 'dedi', 'role' => User::ROLE_PEMANTAU, 'school_id' => $harapan],
             ['name' => 'Bu Sari',  'username' => 'sari', 'role' => User::ROLE_KOORDINATOR],
         ];
 
