@@ -45,8 +45,7 @@ class IncidentReportController extends Controller
             'incident_at' => ['required', 'date'],
             'affected_count' => ['required', 'integer', 'min:1'],
             'description' => ['required', 'string'],
-            'evidence' => ['nullable', 'file', 'mimes:jpg,jpeg,png,pdf', 'max:2048'],
-        ]);
+            'evidence' => ['nullable', 'file', 'mimes:jpg,jpeg,png,pdf', 'max:2048']        ]);
 
         // Validasi Relasi Server-Side (AC-03): Memastikan distribusi milik sekolah yang dipilih
         $distribution = MealDistribution::findOrFail($validated['meal_distribution_id']);
